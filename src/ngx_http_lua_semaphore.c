@@ -566,6 +566,10 @@ ngx_http_lua_ffi_sema_gc(ngx_http_lua_sema_t *sem)
                       "destroyed", sem);
     }
 
+    if (sem->sem_event.posted) {
+        ngx_delete_posted_event(&sem->sem_event);
+    }
+
     ngx_http_lua_free_sema(sem);
 }
 
