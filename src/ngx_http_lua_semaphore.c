@@ -466,8 +466,10 @@ ngx_http_lua_sema_handler(ngx_event_t *ev)
 
     sem = ev->data;
 
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, ngx_cycle->log, 0,
+                   "http lua semaphore handler empty %d, resource count: %d",
+                   ngx_queue_empty(&sem->wait_queue), sem->resource_count);
     while (!ngx_queue_empty(&sem->wait_queue) && sem->resource_count > 0) {
-
         q = ngx_queue_head(&sem->wait_queue);
         ngx_queue_remove(q);
 

@@ -118,3 +118,42 @@ hello, world
 --- no_shutdown_error_log
 semaphore gc wait queue is not empty
 --- SKIP
+
+
+
+=== TEST 3: exit before post_handler was called
+--- config
+    location /t {
+        content_by_lua_block {
+            local semaphore = require "ngx.semaphore"
+            local sem = semaphore.new()
+
+            local function sem_wait()
+                ngx.log(ngx.ERR, "ngx.sem wait start")
+                local ok, err = sem:wait(10)
+                if not ok then
+                    ngx.log(ngx.ERR, "ngx.sem wait err: ", err)
+                else
+                    ngx.log(ngx.ERR, "ngx.sem wait success")
+                end
+            end
+            local co = ngx.thread.spawn(sem_wait)
+            ngx.log(ngx.ERR, "ngx.sem post start")
+            sem:post()
+            ngx.log(ngx.ERR, "ngx.sem post end")
+            ngx.say("hello")
+            ngx.exit(200)
+            ngx.say("not reach here")
+        }
+    }
+--- request
+GET /t
+--- response_body
+hello
+--- grep_error_log eval: qr/(ngx.sem .*?,|http close request|http lua semaphore handler empty 1, resource count: 1)/
+--- grep_error_log_out
+ngx.sem wait start,
+ngx.sem post start,
+ngx.sem post end,
+http close request
+http lua semaphore handler empty 1, resource count: 1
