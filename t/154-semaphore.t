@@ -122,6 +122,8 @@ semaphore gc wait queue is not empty
 
 
 === TEST 3: exit before post_handler was called
+If gc is called before the ngx_http_lua_sema_handler and free the sema memory
+ngx_http_lua_sema_handler would use the freed memory.
 --- config
     location /t {
         content_by_lua_block {
