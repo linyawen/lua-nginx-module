@@ -152,10 +152,10 @@ ngx_http_lua_sema_handler would use the freed memory.
 GET /t
 --- response_body
 hello
---- grep_error_log eval: qr/(ngx.sem .*?,|http close request|http lua semaphore handler empty 1, resource count: 1)/
+--- grep_error_log eval: qr/(ngx.sem .*?,|http close request|semaphore handler: wait queue: empty, resource count: 1)/
 --- grep_error_log_out
 ngx.sem wait start,
 ngx.sem post start,
 ngx.sem post end,
 http close request
-http lua semaphore handler empty 1, resource count: 1
+semaphore handler: wait queue: empty, resource count: 1
